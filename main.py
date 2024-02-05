@@ -12,20 +12,21 @@ bot = telebot.TeleBot(os.getenv("TELEGRAM_BOT_TOKEN"))
 
 
 def main(teacher, search):
+    print("Starting...")
     options = webdriver.EdgeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--headless")
+    # options.add_argument("--no-sandbox")
+    # options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Edge(options=options)
 
     driver.get("https://edugate.jadara.edu.jo/student")
 
     username = driver.find_element(By.ID, "lognForm:j_idt14")
-    username.send_keys(os.getenv("USERNAME"))
+    username.send_keys(os.getenv("USERNAME_"))
 
     password = driver.find_element(By.ID, "lognForm:j_idt18")
-    password.send_keys(os.getenv("PASSWORD"))
+    password.send_keys(os.getenv("PASSWORD_"))
 
     password.send_keys(Keys.ENTER)
     time.sleep(0.5)
@@ -75,26 +76,5 @@ def main(teacher, search):
             final = clase.find_elements(By.TAG_NAME, "td")[-1].text
             break
     driver.quit()
+    print("Done")
     return final
-
-
-@bot.message_handler(commands=["start"])
-def send_welcome(message):
-    bot.reply_to(message, "Howdy, how are you doing?")
-
-
-@bot.message_handler(commands=["help"])
-def send_help(message):
-    bot.reply_to(message, "I can help you with that")
-
-
-# any message that contains "/get teacher search" will trigger this function
-@bot.message_handler(regexp="\/get (.+) (.+)")
-def get_class(message):
-    teacher = int(message.text.split()[1])
-    search = message.text.split()[2]
-    state = main(teacher, search)
-    bot.reply_to(message, state)
-
-
-bot.polling()
